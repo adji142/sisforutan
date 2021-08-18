@@ -11,7 +11,7 @@
  Target Server Version : 100406
  File Encoding         : 65001
 
- Date: 17/08/2021 23:12:58
+ Date: 18/08/2021 19:19:27
 */
 
 SET NAMES utf8mb4;
@@ -28,11 +28,14 @@ CREATE TABLE `loglokasi`  (
   `KodeTahanan` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `TanggalTransaksi` datetime(6) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of loglokasi
 -- ----------------------------
+INSERT INTO `loglokasi` VALUES (1, 1, '10001', '1001', '2021-08-18 05:10:04.000000');
+INSERT INTO `loglokasi` VALUES (2, 1, '10001', '1001', '2021-08-18 05:13:33.000000');
+INSERT INTO `loglokasi` VALUES (3, 2, '10001', '1001', '2021-08-18 05:13:50.000000');
 
 -- ----------------------------
 -- Table structure for permission
@@ -125,15 +128,16 @@ CREATE TABLE `ttahanan`  (
   `KodeLokasi` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `NamaLokasi` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `StatusTahanan` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `Attachment` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
   PRIMARY KEY (`KodeTahanan`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ttahanan
 -- ----------------------------
-INSERT INTO `ttahanan` VALUES ('1001', 'Haryono', 'Solo', '2021-08-17', 10, '10001', 'Kamar AB', '1');
-INSERT INTO `ttahanan` VALUES ('1002', 'Haryanto', 'suka miskin', '2021-08-17', 15, '10002', 'Lokasi B', '1');
-INSERT INTO `ttahanan` VALUES ('1003', 'sukirdi', 'kardo', '2021-08-17', 20, '10002', 'Lokasi B', '1');
+INSERT INTO `ttahanan` VALUES ('1001', 'Haryono', 'Solo', '2021-08-17', 10, '10001', 'Kamar AB', '1', 'http://192.168.1.66/rutan/localData/images/scaled_89bcd036-8a60-4116-b93a-4c34279f4ba49058801568372055853.jpg');
+INSERT INTO `ttahanan` VALUES ('1002', 'Haryanto', 'suka miskin', '2021-08-17', 15, '10002', 'Lokasi B', '1', '');
+INSERT INTO `ttahanan` VALUES ('1003', 'sukirdi', 'kardo', '2021-08-17', 20, '10002', 'Lokasi B', '1', '');
 
 -- ----------------------------
 -- Table structure for userrole

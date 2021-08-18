@@ -25,4 +25,9 @@ class Tahanan{
     return json.decode(response.body);
   }
 
+  Future<Map> scanQR()async{
+    var url = 'http://${session.server}/APITahananScanQR';
+    final response = await http.post(url, body: param);  
+    return json.decode(response.body);
+  }
 }

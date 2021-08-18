@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                     )
                   ),    
 
-                  Text("SISTEM INFORMASI RUTAN", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),),
+                  Text("SISTEM RUTAN", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),),
                   Text("RUTAN CERIA", style: TextStyle(color: Colors.white, fontSize: 16),),
 
               ],)

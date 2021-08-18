@@ -49,7 +49,33 @@ class API_Tahanan extends CI_Controller {
 		$StatusTahanan = $this->input->post('StatusTahanan');
 		$NamaLokasi = $this->input->post('NamaLokasi');
 		$formtype = $this->input->post('formtype');
+		$Attachment = $this->input->post('Attachment');
 
+		$image = $this->input->post('baseimage');
+		$imagename = $this->input->post('imagename');
+		$fulllink = '';
+
+		if ($imagename != '') {
+			 $temp = base64_decode($image);
+			$link = 'localData/images/'.$imagename;
+
+
+			try {
+				file_put_contents($link, $temp);	
+			} catch (Exception $e) {
+				$data['message'] = $e->getMessage();
+			}
+
+			$fulllink = base_url().$link;
+		}
+		
+		if ($fulllink == '') {
+			$fulllink = $Attachment;
+		}
+		else{
+			$fulllink = $fulllink;
+		}
+		
 		$param = array(
 			'KodeTahanan' => $KodeTahanan,
 			'NamaTahanan' => $NamaTahanan,
@@ -58,7 +84,8 @@ class API_Tahanan extends CI_Controller {
 			'LamaTahanan' => $LamaTahanan,
 			'KodeLokasi' => $KodeLokasi,
 			'StatusTahanan' => $StatusTahanan,
-			'NamaLokasi'	=> $NamaLokasi
+			'NamaLokasi'	=> $NamaLokasi,
+			'Attachment'	=> $fulllink 
 		);
 
 
@@ -108,6 +135,7 @@ class API_Tahanan extends CI_Controller {
 		$data = array('success' => false ,'message'=>array(),'data'=>array());
 
 		$KodeLokasi = $this->input->post('KodeLokasi');
+		$Tanggal = $this->input->post('Tanggal');
 
 		$SQL = "
 			SELECT 
@@ -118,16 +146,46 @@ class API_Tahanan extends CI_Controller {
 			FROM ttahanan a
 			LEFT JOIN tlokasi b on a.KodeLokasi = b.KodeLokasi
 			LEFT JOIN loglokasi c on a.KodeTahanan = c.KodeTahanan
-			WHERE b.KodeLokasi LIKE '%$KodeLokasi%'
-			GROUP BY a.KodeTahanan, a.KodeLokasi
+			WHERE CAST(c.TanggalTransaksi AS DATE) = CAST('$Tanggal' AS DATE ) 
 		";
 
+		if ($KodeLokasi != '') {
+			$SQL .= " AND b.KodeLokasi = '$KodeLokasi' ";
+		}
+		$SQL .= " GROUP BY a.KodeTahanan, a.KodeLokasi";
+
+		// var_dump($SQL);
 		$rs = $this->db->query($SQL);
 
 		if ($rs) {
 			$data['success'] = true;
 			$data['data'] = $rs->result();
 		}
+		echo json_encode($data);
+	}
+	public function ScanQR()
+	{
+		$data = array('success' => false ,'message'=>array(),'data'=>array());
+		$id = 0;
+		$Transaksi = $this->input->post('Transaksi');
+		$KodeLokasi = $this->input->post('KodeLokasi');
+		$KodeTahanan = $this->input->post('KodeTahanan');
+		$TanggalTransaksi = date("Y-m-d h:i:sa");
+
+		$param = array(
+			'id' => $id,
+			'Transaksi' => $Transaksi,
+			'KodeLokasi' => $KodeLokasi,
+			'KodeTahanan' => $KodeTahanan,
+			'TanggalTransaksi' => $TanggalTransaksi,
+		);
+
+		$rs = $this->ModelsExecuteMaster->ExecInsert($param,'loglokasi');
+
+		if ($rs) {
+			$data['success'] = true;
+		}
+
 		echo json_encode($data);
 	}
 }

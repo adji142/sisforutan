@@ -173,7 +173,7 @@ class _HomeState extends State<Home> {
                         //     Expanded(child: Text(list[index]['NamaStatus'], style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),)),
                         // ],),
                         onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => DaftarCheck(this.widget.session,list[index]['NamaLokasi'],list[index]['AreaUmum'].toString() == "0" ? list[index]['KodeLokasi'] : "" )));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => DaftarCheck(this.widget.session,list[index]['NamaLokasi'],list[index]['KodeLokasi'] )));
                         },
                       ),
                     );

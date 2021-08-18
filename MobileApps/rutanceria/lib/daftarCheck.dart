@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rutanceria/models/session.dart';
 import 'package:rutanceria/models/tahanan.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
 class DaftarCheck extends StatefulWidget{
   final Session session;
@@ -19,6 +21,21 @@ class _DaftarCheckState extends State<DaftarCheck> {
   Icon _appIcon = Icon(Icons.search, size: 32.0,);
   TextEditingController _searchText = TextEditingController();
 
+  DateTime selectedDate = DateTime.now();
+    _selectDate(BuildContext context) async {
+      final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+      );
+      if (picked != null && picked != selectedDate)
+        setState(() {
+          selectedDate = picked.toLocal();
+        });
+        print(selectedDate);
+    }
+    
   void initState() {
     super.initState();
   }
@@ -30,7 +47,8 @@ class _DaftarCheckState extends State<DaftarCheck> {
 
     Map param(){
       return {
-        'KodeLokasi' : this.widget.kodelokasi.toString()
+        'KodeLokasi' : this.widget.kodelokasi.toString(),
+        'Tanggal'    : selectedDate.toString()
       };
     }
     return Scaffold(
@@ -48,16 +66,48 @@ class _DaftarCheckState extends State<DaftarCheck> {
             ],
       ),
       body: Container(
-              child: FutureBuilder(
-                future: Tahanan(widget.session, param: param()).getTahananPerlokasi(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  return snapshot.hasData
-                      ? _itemData(snapshot.data["data"])
-                      : new Center(
-                            child: new CircularProgressIndicator(),
-                        );
-                },
+              child: Column(
+                children: [
+                  Container(
+                    width: width * 100,
+                    height:  height * 7,
+                    child: Center(
+                      child: GestureDetector(
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Text(
+                            selectedDate.toString().split(' ')[0],
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        onTap: (){
+                          _selectDate(context);
+                          print(selectedDate);
+                        },
+                      ),
+                    )
+                  ),
+                  Divider(),
+                  Container(
+                    width:  width * 100,
+                    height: height * 65,
+                    child: FutureBuilder(
+                      future: Tahanan(widget.session, param: param()).getTahananPerlokasi(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) print(snapshot.error);
+                        return snapshot.hasData
+                            ? _itemData(snapshot.data["data"])
+                            : new Center(
+                                  child: new CircularProgressIndicator(),
+                              );
+                      },
+                    )
+                  )
+                ],
               )
       ),
       bottomNavigationBar: Container(
@@ -65,14 +115,35 @@ class _DaftarCheckState extends State<DaftarCheck> {
         width: width * 100,
         height: height * 10,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: width * 45,
+              width: width * 40,
               height: height * 10,
               child: RaisedButton(
-                onPressed: (){
+                onPressed: ()async{
+                  var statusCamera = await Permission.camera.status;
+                  if(statusCamera.isUndetermined){
+                    await Permission.camera.request();
+                  }
+                  String result = await scanner.scan();
 
+                  if(result.characters.toString() != ""){
+                    Map param(){
+                      return {
+                        'Transaksi' : "1",
+                        'KodeLokasi' : this.widget.kodelokasi.toString(),
+                        'KodeTahanan' : result.characters.toString()
+                      };
+                    }
+                    Tahanan th = new Tahanan(this.widget.session, param: param());
+                    th.scanQR().then((value) {
+                      // Navigator.pop(context);
+                      setState(() {
+                        
+                      });
+                    });
+                  }
                 },
                 color: Colors.green,
                 textColor: Colors.white,
@@ -81,11 +152,32 @@ class _DaftarCheckState extends State<DaftarCheck> {
             ),
             SizedBox(width: width*5,),
             SizedBox(
-              width: width * 45,
+              width: width * 40,
               height: height * 10,
               child: RaisedButton(
-                onPressed: (){
+                onPressed: ()async{
+                  var statusCamera = await Permission.camera.status;
+                  if(statusCamera.isUndetermined){
+                    await Permission.camera.request();
+                  }
+                  String result = await scanner.scan();
 
+                  if(result.characters.toString() != ""){
+                    Map param(){
+                      return {
+                        'Transaksi' : "2",
+                        'KodeLokasi' : this.widget.kodelokasi.toString(),
+                        'KodeTahanan' : result.characters.toString()
+                      };
+                    }
+                    Tahanan th = new Tahanan(this.widget.session, param: param());
+                    th.scanQR().then((value) {
+                      // Navigator.pop(context);
+                      setState(() {
+                        
+                      });
+                    });
+                  }
                 },
                 color: Colors.red,
                 textColor: Colors.white,
@@ -162,9 +254,6 @@ class _DaftarCheckState extends State<DaftarCheck> {
                             ],
                           ),
                         ),
-                        onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => DaftarCheck(this.widget.session,list[index]['NamaLokasi'],list[index]['KodeLokasi'])));
-                        },
                       ),
                     );
           },

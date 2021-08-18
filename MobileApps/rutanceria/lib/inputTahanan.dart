@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:rutanceria/generals/dialogs.dart';
@@ -7,6 +9,7 @@ import 'package:rutanceria/models/lokasi.dart';
 import 'package:rutanceria/models/session.dart';
 import 'package:rutanceria/generals/inputdata.dart';
 import 'package:rutanceria/models/tahanan.dart';
+import 'package:image_picker/image_picker.dart';
 
 class FormInputTahanan extends StatefulWidget{
   final Session session;
@@ -27,6 +30,21 @@ class _FormInputTahananState extends State<FormInputTahanan>{
   String kodeLokasi = "";
   String namaLokasi = "";
   int statusTahanan = 1;
+  String attachment = "";
+
+  DateTime selectedDate = DateTime.now();
+    _selectDate(BuildContext context) async {
+      final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+      );
+      if (picked != null && picked != selectedDate)
+        setState(() {
+          selectedDate = picked.toLocal();
+        });
+    }
 
   bool _proses = false;
   @override
@@ -42,6 +60,7 @@ class _FormInputTahananState extends State<FormInputTahanan>{
       lamaTahanan = 0.0;
       kodeLokasi = "";
       statusTahanan = 1;
+      attachment = "";
     }
     else{
       kodeTahanan = this.widget.list[this.widget.index]["KodeTahanan"];
@@ -52,6 +71,7 @@ class _FormInputTahananState extends State<FormInputTahanan>{
       kodeLokasi = this.widget.list[this.widget.index]["KodeLokasi"];
       namaLokasi = this.widget.list[this.widget.index]["NamaLokasi"];
       statusTahanan = int.parse(this.widget.list[this.widget.index]["StatusTahanan"]);
+      attachment = this.widget.list[this.widget.index]["Attachment"];
 
     }
     super.initState();
@@ -70,7 +90,10 @@ class _FormInputTahananState extends State<FormInputTahanan>{
         'KodeLokasi'  : kodeLokasi.toString(),
         'StatusTahanan' : statusTahanan.toString(),
         'NamaLokasi' : namaLokasi.toString(),
-        'formtype'   : this.widget.list == null ? 'add' : 'edit'
+        'formtype'   : this.widget.list == null ? 'add' : 'edit',
+        'baseimage'     : image64.toString(),
+        'imagename'     : extentionPath.toString(),
+        'Attachment' : attachment.toString()
       };
     }
     Tahanan data = new Tahanan(this.widget.session, param: param());
@@ -87,22 +110,97 @@ class _FormInputTahananState extends State<FormInputTahanan>{
       });
     }
   }
+
+  var _imageFile;
+  File imageFile;
+  List pathext;
+  String extentionPath;
+  String image64 = "";
+
+  _openGalery(BuildContext context) async{
+    var picture = await ImagePicker.pickImage(source: ImageSource.gallery,maxHeight: 600).then((value) {
+      this.setState((){
+        imageFile = value;
+        pathext = value.uri.toString().split("/");
+        extentionPath = pathext[pathext.length-1].toString();
+        if (imageFile != null){
+          final bites = imageFile.readAsBytesSync();
+          setState(() {
+            image64 = base64Encode(bites);
+          });
+        }
+      }); 
+      Navigator.of(context).pop();
+      print(image64);
+    });
+  }
+
+    _openCamera(BuildContext context)async{
+    var picture = await ImagePicker.pickImage(source: ImageSource.camera,maxHeight: 600).then((value) {
+      this.setState((){
+        imageFile = value;
+        pathext = value.uri.toString().split("/");
+        extentionPath = pathext[pathext.length-1].toString();
+
+        if (imageFile != null){
+          final bites = imageFile.readAsBytesSync();
+          setState(() {
+            image64 = base64Encode(bites);
+            print(image64);
+          });
+        }
+
+      }); 
+      Navigator.of(context).pop();
+    });
+  }
+
+    Future<void> _showChoiceDialog(BuildContext context){
+    return showDialog(context: context,builder: (BuildContext contex){
+      return AlertDialog(
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              ListTile(
+                title: Text("Galeri"),
+                leading: Icon(Icons.photo),
+                onTap: (){
+                  _openGalery(context);
+                  if(imageFile != null){
+                    final bites = File(imageFile.toString()).readAsBytesSync();
+                    setState(() {
+                      image64 = base64Encode(bites);
+                    });
+                    print(image64);
+                  }
+                },
+              ),
+              ListTile(
+                title: Text("Camera"),
+                leading: Icon(Icons.camera),
+                onTap: (){
+                  _openCamera(context);
+                  if(imageFile != null){
+                    final bites = File(imageFile.toString()).readAsBytesSync();
+                    setState(() {
+                      image64 = base64Encode(bites);
+                    });
+                    print(image64);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    DateTime selectedDate = DateTime.now();
-    _selectDate(BuildContext context) async {
-      final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2025),
-      );
-      if (picked != null && picked != selectedDate)
-        setState(() {
-          selectedDate = picked.toLocal();
-        });
-    }
+    var width = MediaQuery.of(context).size.width / 100;
+    var height = MediaQuery.of(context).size.height / 100;
 
     return Scaffold(
       appBar: AppBar(
@@ -122,6 +220,30 @@ class _FormInputTahananState extends State<FormInputTahanan>{
       body: ListView(
         padding: EdgeInsets.all(5),
         children: <Widget>[
+          ExpansionTile(
+            initiallyExpanded: true,
+            title: Text("Foto", style: TextStyle(color: Theme.of(context).primaryColorDark),),
+            children: [
+              Container(
+                width: width * 30,
+                height: width * 30,
+                child: Padding(
+                  padding: EdgeInsets.all(5),
+                  child: GestureDetector(
+                    child: Card(
+                      child:  imageFile == null 
+                      ? this.widget.list[this.widget.index]["Attachment"] == '' ? Center(child: Icon(Icons.camera_alt),) : Image.network(this.widget.list[this.widget.index]["Attachment"])
+                      : this.widget.list[this.widget.index]["Attachment"] == '' ? Image.file(File(imageFile.path)) : Image.network(this.widget.list[this.widget.index]["Attachment"]),
+                    ),
+                    onTap: (){
+                      _showChoiceDialog(context);
+                    },
+                  )
+                ),
+              )
+            ],
+          ),
+
           // Kode Tahanan
           ExpansionTile(
             initiallyExpanded: true,
