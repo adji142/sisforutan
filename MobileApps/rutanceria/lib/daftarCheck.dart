@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rutanceria/generals/dialogs.dart';
 import 'package:rutanceria/models/session.dart';
 import 'package:rutanceria/models/tahanan.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
@@ -35,7 +36,7 @@ class _DaftarCheckState extends State<DaftarCheck> {
         });
         print(selectedDate);
     }
-    
+
   void initState() {
     super.initState();
   }
@@ -123,7 +124,7 @@ class _DaftarCheckState extends State<DaftarCheck> {
               child: RaisedButton(
                 onPressed: ()async{
                   var statusCamera = await Permission.camera.status;
-                  if(statusCamera.isUndetermined){
+                  if(!statusCamera.isGranted){
                     await Permission.camera.request();
                   }
                   String result = await scanner.scan();
@@ -156,10 +157,14 @@ class _DaftarCheckState extends State<DaftarCheck> {
               height: height * 10,
               child: RaisedButton(
                 onPressed: ()async{
+                  // messageBox(context: context, title: "Info", message: "Step1");
                   var statusCamera = await Permission.camera.status;
-                  if(statusCamera.isUndetermined){
+                  // messageBox(context: context, title: "Info", message: statusCamera.isGranted.toString());
+                  if(!statusCamera.isGranted){
+                    // messageBox(context: context, title: "Info", message: "Req Permission");
                     await Permission.camera.request();
                   }
+                  // messageBox(context: context, title: "Info", message: "Request QR");
                   String result = await scanner.scan();
 
                   if(result.characters.toString() != ""){
@@ -222,7 +227,17 @@ class _DaftarCheckState extends State<DaftarCheck> {
           itemBuilder: (context, index) {
             return Card(
                       child: ListTile(
-                        leading: Icon(Icons.widgets, color: Theme.of(context).primaryColor,),
+                        leading: list[index]["Attachment"] == '' ? CircleAvatar(child: Icon(Icons.people),) : Container(
+                          width: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(list[index]["Attachment"])
+                            )
+                          ),
+                        ),
+                        // Icon(Icons.widgets, color: Theme.of(context).primaryColor,),
                         title: Text(list[index]['NamaTahanan'],  style: TextStyle(
                                                                           color: Theme.of(context).primaryColorDark,
                                                                           fontWeight:FontWeight.bold

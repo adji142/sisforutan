@@ -24,7 +24,7 @@ class API_Tahanan extends CI_Controller {
 				";
 
 		if ($KodeTahanan != '') {
-			$SQL .=" AND a.NamaTahanan = '$NamaTahanan'";
+			$SQL .=" AND a.KodeTahanan = '$KodeTahanan'";
 		}
 
 		$rs = $this->db->query($SQL);
@@ -137,22 +137,34 @@ class API_Tahanan extends CI_Controller {
 		$KodeLokasi = $this->input->post('KodeLokasi');
 		$Tanggal = $this->input->post('Tanggal');
 
+		// $SQL = "
+		// 	SELECT 
+		// 		a.KodeTahanan, a.NamaTahanan,
+		// 		c.KodeLokasi, b.NamaLokasi,
+		// 		COALESCE(a.Attachment,'') Attachment,
+		// 		SUM(CASE WHEN c.Transaksi = 1 THEN 1 ELSE 0 END) CheckIn,
+		// 		SUM(CASE WHEN c.Transaksi = 2 THEN 1 ELSE 0 END) CheckOut
+		// 	FROM ttahanan a
+		// 	LEFT JOIN loglokasi c on a.KodeTahanan = c.KodeTahanan
+		// 	LEFT JOIN tlokasi b on c.KodeLokasi = b.KodeLokasi
+		// 	AND CAST(c.TanggalTransaksi AS DATE) = CAST('$Tanggal' AS DATE ) 
+		// ";
+
 		$SQL = "
 			SELECT 
 				a.KodeTahanan, a.NamaTahanan,
-				a.KodeLokasi, b.NamaLokasi,
-				SUM(CASE WHEN c.Transaksi = 1 THEN 1 ELSE 0 END) CheckIn,
-				SUM(CASE WHEN c.Transaksi = 2 THEN 1 ELSE 0 END) CheckOut
-			FROM ttahanan a
-			LEFT JOIN tlokasi b on a.KodeLokasi = b.KodeLokasi
-			LEFT JOIN loglokasi c on a.KodeTahanan = c.KodeTahanan
-			WHERE CAST(c.TanggalTransaksi AS DATE) = CAST('$Tanggal' AS DATE ) 
+				COALESCE(b.KodeLokasi, a.KodeLokasi) KodeLokasi,
+				COALESCE(a.Attachment,'') Attachment,
+				SUM(CASE WHEN b.Transaksi = 1 THEN 1 ELSE 0 END) CheckIn,
+				SUM(CASE WHEN b.Transaksi = 2 THEN 1 ELSE 0 END) CheckOut
+			FROM ttahanan a 
+			LEFT JOIN loglokasi b on a.KodeTahanan = b.KodeTahanan 
 		";
 
 		if ($KodeLokasi != '') {
-			$SQL .= " AND b.KodeLokasi = '$KodeLokasi' ";
+			$SQL .= " WHERE COALESCE(b.KodeLokasi, a.KodeLokasi) = '$KodeLokasi' ";
 		}
-		$SQL .= " GROUP BY a.KodeTahanan, a.KodeLokasi";
+		$SQL .= " GROUP BY a.KodeTahanan, c.KodeLokasi";
 
 		// var_dump($SQL);
 		$rs = $this->db->query($SQL);
@@ -186,6 +198,26 @@ class API_Tahanan extends CI_Controller {
 			$data['success'] = true;
 		}
 
+		echo json_encode($data);
+	}
+	public function readLog()
+	{
+		$data = array('success' => false ,'message'=>array(),'data'=>array());
+
+		$Tanggal = $this->input->post('Tanggal');
+		$KodeTahanan = $this->input->post('KodeTahanan');
+
+		$SQL = "SELECT a.*, b.NamaLokasi FROM loglokasi a 
+				LEFT JOIN tlokasi b on a.KodeLokasi= b.KodeLokasi
+				where CAST(a.TanggalTransaksi AS DATE) = '$Tanggal'
+				AND a.KodeTahanan = '$KodeTahanan' ORDER BY a.KodeLokasi, a.TanggalTransaksi
+				";
+
+		$rs = $this->db->query($SQL);
+		if ($rs) {
+			$data['success'] = true;
+			$data['data'] = $rs->result();
+		}
 		echo json_encode($data);
 	}
 }

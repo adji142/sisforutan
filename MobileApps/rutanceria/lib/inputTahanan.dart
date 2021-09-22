@@ -232,8 +232,8 @@ class _FormInputTahananState extends State<FormInputTahanan>{
                   child: GestureDetector(
                     child: Card(
                       child:  imageFile == null 
-                      ? this.widget.list[this.widget.index]["Attachment"] == '' ? Center(child: Icon(Icons.camera_alt),) : Image.network(this.widget.list[this.widget.index]["Attachment"])
-                      : this.widget.list[this.widget.index]["Attachment"] == '' ? Image.file(File(imageFile.path)) : Image.network(this.widget.list[this.widget.index]["Attachment"]),
+                      ? this.widget.list == null ? Center(child: Icon(Icons.camera_alt),) : Image.network(this.widget.list[this.widget.index]["Attachment"])
+                      : this.widget.list == null ? Image.file(File(imageFile.path)) : Image.network(this.widget.list[this.widget.index]["Attachment"]),
                     ),
                     onTap: (){
                       _showChoiceDialog(context);

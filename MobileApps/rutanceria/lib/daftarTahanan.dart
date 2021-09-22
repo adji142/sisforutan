@@ -128,8 +128,20 @@ class _DaftarTahananState extends State<DaftarTahanan> {
           itemCount: list == null ? 0 : list.length,
           itemBuilder: (context, index) {
             return Card(
-                      child: ListTile(
-                        leading: Icon(Icons.widgets, color: Theme.of(context).primaryColor,),
+                      child:  ListTile(
+                        leading: list[index]["Attachment"] == '' ? CircleAvatar(child: Icon(Icons.people),) : Container(
+                          width: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(list[index]["Attachment"])
+                            )
+                          ),
+                        ),
+                        // CircleAvatar(
+                        //   child: list[index]["Attachment"] == '' ? Icon(Icons.people) : Image.network(list[index]["Attachment"]),
+                        // ),
                         title: Text(list[index]['KodeTahanan'],  style: TextStyle(
                                                                           color: Theme.of(context).primaryColorDark,
                                                                           fontWeight:FontWeight.bold

@@ -22,8 +22,9 @@ class _LoginPageState extends State<LoginPage> {
     
     session.kodeUser= "";
     session.namaUser= "";
-    session.server= "192.168.1.66/rutan";
-    session.appName = "Rutan Ceria";
+    session.server= "demo.aiscoder.com/rutan";
+    // session.server= "192.168.1.66/rutan";
+    session.appName = "Sistem Informasi Rutan Bantul";
     _ratio = 2;
     super.initState();
   }
@@ -63,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),    
 
                   Text("SISTEM RUTAN", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),),
-                  Text("RUTAN CERIA", style: TextStyle(color: Colors.white, fontSize: 16),),
+                  Text(session.appName, style: TextStyle(color: Colors.white, fontSize: 16),),
 
               ],)
             ),

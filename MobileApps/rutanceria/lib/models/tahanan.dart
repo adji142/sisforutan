@@ -30,4 +30,16 @@ class Tahanan{
     final response = await http.post(url, body: param);  
     return json.decode(response.body);
   }
+
+  Future<Map> readLog(String tanggal, String kodetahanan)async{
+    Map paramLog(){
+    return{
+      'Tanggal' : tanggal.toString(),
+      'KodeTahanan' : kodetahanan.toString()
+    };
+  }
+    var url = 'http://${session.server}/APITahananReadLog';
+    final response = await http.post(url, body: paramLog());  
+    return json.decode(response.body);
+  }
 }

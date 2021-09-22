@@ -101,6 +101,7 @@ $route['APILokasiGetLookup'] = 'API/API_Lokasi/getLookup';
 $route['APITahananRead'] = 'API/API_Tahanan/Read';
 $route['APITahananCRUD'] = 'API/API_Tahanan/CRUD';
 $route['APITahananperLocation'] = 'API/API_Tahanan/ReadPerLocation';
+$route['APITahananReadLog'] = 'API/API_Tahanan/readLog';
 
 // Scan QR
 $route['APITahananScanQR'] = 'API/API_Tahanan/ScanQR';

@@ -33,7 +33,7 @@ dependencies:
   qrscan: ^0.2.17
   permission_handler: ^5.1.0+2
   image_picker: ^0.6.7+11
-
+  intl: ^0.17.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

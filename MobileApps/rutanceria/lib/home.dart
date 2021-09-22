@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:rutanceria/daftarCheck.dart';
 import 'package:rutanceria/daftarLokasi.dart';
 import 'package:rutanceria/daftarTahanan.dart';
+import 'package:rutanceria/detailtahanan.dart';
 import 'package:rutanceria/models/login.dart';
 import 'package:rutanceria/models/lokasi.dart';
 import 'package:rutanceria/models/session.dart';
@@ -135,13 +136,16 @@ class _HomeState extends State<Home> {
         Container(
           color: Theme.of(context).primaryColorLight,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10.0),
             child: TextField(
               controller: _searchText,
               autofocus: true,
-              decoration: InputDecoration.collapsed(hintText: "Cari Data"),
+              decoration: InputDecoration.collapsed(hintText: "Cari Tahanan dengan Kode / Nama"),
               textInputAction: TextInputAction.search,
-              onChanged: (value) => setState((){})
+              // onChanged: (value) => setState((){})
+              onSubmitted: (val){
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailTahanan(this.widget.session, val.toString())));
+              },
             ),
           )
         )
