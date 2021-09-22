@@ -164,7 +164,7 @@ class API_Tahanan extends CI_Controller {
 		if ($KodeLokasi != '') {
 			$SQL .= " WHERE COALESCE(b.KodeLokasi, a.KodeLokasi) = '$KodeLokasi' ";
 		}
-		$SQL .= " GROUP BY a.KodeTahanan, c.KodeLokasi";
+		$SQL .= " GROUP BY a.KodeTahanan, COALESCE(b.KodeLokasi, a.KodeLokasi) ";
 
 		// var_dump($SQL);
 		$rs = $this->db->query($SQL);
